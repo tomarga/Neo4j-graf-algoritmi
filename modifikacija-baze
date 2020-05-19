@@ -1,0 +1,402 @@
+
+/*
+Iz opisa zadatka: 
+1. Pretvoriti udaljenosti između gradova u vrijeme koje je potrebno za prevaliti put između njih.
+2. Dodati za svaki grad vrijeme prolaska kroz sam grad.
+*/
+
+/**********************************************************************************************************************************************************************/
+
+/*
+Dodavanje novih svojstava brida CONNECTION: durationGM i roadType.
+_durationGM_ označava vrijeme potrebno za preći udaljenost između dva grada po Google mapsu. 
+To svojstvo koristimo samo za provjeru vremena(_duration_) kojeg ćemo naknadno dobiti računski - uzimajući u obzir
+udaljenost te prosječnu brzinu vožnje na toj relaciji.
+_roadType_ označava vrstu ceste između dva grada, a moguće vrijednosti su: 'highway'(autocesta) i 'state road'(državna cesta).
+Ovisno o tom svojstvu se određuje prosječna brzina vožnje na određenoj relaciji. 
+*/
+
+/*
+Bridovi u kojima bi se eventualno trebale promijeniti _distance_ vrijednosti
+(jer je bila izabrana duljina najkraćeg, a ne optimalnog puta) sadrže
+komentirano u zadnjem retku moguću novu vrijednost.
+*/
+
+/*
+Da bi se na ovakav način odjednom mogli izvršiti svi dole navedeni MATCH upiti,
+potrebno je u Neo4j browser settingsima postaviti kvačicu na 'Enable multi statement query editor'.
+*/
+
+MATCH (city1:City)-[c:CONNECTION]-(city2:City)
+WHERE 
+    city1.name = "Dubrovnik" AND 
+    city2.name = "Makarska"
+SET c.durationGM = duration( {hours:2, minutes:22} ), c.roadType = "state road";
+
+MATCH (city1:City)-[c:CONNECTION]-(city2:City)
+WHERE 
+    city1.name = "Imotski" AND 
+    city2.name = "Makarska"
+SET c.durationGM = duration( {minutes:39} ), c.roadType = "state road";
+
+MATCH (city1:City)-[c:CONNECTION]-(city2:City)
+WHERE 
+    city1.name = "Imotski" AND 
+    city2.name = "Sinj"
+SET c.durationGM = duration( {hours:1, minutes:2} ), c.roadType = "state road";
+
+MATCH (city1:City)-[c:CONNECTION]-(city2:City)
+WHERE 
+    city1.name = "Split" AND 
+    city2.name = "Makarska"
+SET c.durationGM = duration( {hours:1, minutes:7} ), c.roadType = "highway";
+
+MATCH (city1:City)-[c:CONNECTION]-(city2:City)
+WHERE 
+    city1.name = "Split" AND 
+    city2.name = "Sinj"
+SET c.durationGM = duration( {minutes:40} ), c.roadType = "state road";
+
+MATCH (city1:City)-[c:CONNECTION]-(city2:City)
+WHERE 
+    city1.name = "Split" AND 
+    city2.name = "Kastela"
+SET c.durationGM = duration( {minutes:25} ), c.roadType = "state road";
+
+MATCH (city1:City)-[c:CONNECTION]-(city2:City)
+WHERE 
+    city1.name = "Sinj" AND 
+    city2.name = "Knin"
+SET c.durationGM = duration( {hours:1, minutes:7} ), c.roadType = "state road";
+
+MATCH (city1:City)-[c:CONNECTION]-(city2:City)
+WHERE 
+    city1.name = "Kastela" AND 
+    city2.name = "Sibenik"
+SET c.durationGM = duration( {minutes:54} ), c.roadType = "highway";
+// , c.distance = 64.9
+
+MATCH (city1:City)-[c:CONNECTION]-(city2:City)
+WHERE 
+    city1.name = "Sibenik" AND 
+    city2.name = "Knin"
+SET c.durationGM = duration( {minutes:56} ), c.roadType = "state road";
+
+MATCH (city1:City)-[c:CONNECTION]-(city2:City)
+WHERE 
+    city1.name = "Gospic" AND 
+    city2.name = "Knin"
+SET c.durationGM = duration( {hours:1, minutes:27} ), c.roadType = "state road";
+
+MATCH (city1:City)-[c:CONNECTION]-(city2:City)
+WHERE 
+    city1.name = "Sibenik" AND 
+    city2.name = "Zadar"
+SET c.durationGM = duration( {hours:1, minutes:3} ), c.roadType = "highway";
+
+MATCH (city1:City)-[c:CONNECTION]-(city2:City)
+WHERE 
+    city1.name = "Zadar" AND 
+    city2.name = "Gospic"
+SET c.durationGM = duration( {hours:1, minutes:10} ), c.roadType = "highway";
+
+//Ri-Go, ako ne mijenjamo distance - magistrala
+MATCH (city1:City)-[c:CONNECTION]-(city2:City)
+WHERE 
+    city1.name = "Rijeka" AND 
+    city2.name = "Gospic"
+SET c.durationGM = duration( {hours:2, minutes:11} ), c.roadType = "state road";
+
+/*
+//Ri-Go, autocesta
+MATCH (city1:City)-[c:CONNECTION]-(city2:City)
+WHERE 
+    city1.name = "Rijeka" AND 
+    city2.name = "Gospic"
+SET c.durationGM = duration( {hours:2, minutes:11} ), c.roadType = "highway";
+*/
+
+MATCH (city1:City)-[c:CONNECTION]-(city2:City)
+WHERE 
+    city1.name = "Rijeka" AND 
+    city2.name = "Pula"
+SET c.durationGM = duration( {hours:1, minutes:32} ), c.roadType = "state road";
+
+MATCH (city1:City)-[c:CONNECTION]-(city2:City)
+WHERE 
+    city1.name = "Rijeka" AND 
+    city2.name = "Karlovac"
+SET c.durationGM = duration( {hours:1, minutes:19} ), c.roadType = "highway";
+
+MATCH (city1:City)-[c:CONNECTION]-(city2:City)
+WHERE 
+    city1.name = "Karlovac" AND 
+    city2.name = "Gospic"
+SET c.durationGM = duration( {hours:1, minutes:28} ), c.roadType = "highway";
+
+MATCH (city1:City)-[c:CONNECTION]-(city2:City)
+WHERE 
+    city1.name = "Karlovac" AND 
+    city2.name = "Zagreb"
+SET c.durationGM = duration( {minutes:44} ), c.roadType = "highway";
+
+MATCH (city1:City)-[c:CONNECTION]-(city2:City)
+WHERE 
+    city1.name = "Zagreb" AND 
+    city2.name = "Samobor"
+SET c.durationGM = duration( {minutes:31} ), c.roadType = "state road";
+
+MATCH (city1:City)-[c:CONNECTION]-(city2:City)
+WHERE 
+    city1.name = "Zagreb" AND 
+    city2.name = "Varazdin"
+SET c.durationGM = duration( {hours:1, minutes:5} ), c.roadType = "highway";
+
+MATCH (city1:City)-[c:CONNECTION]-(city2:City)
+WHERE 
+    city1.name = "Zagreb" AND 
+    city2.name = "Velika Gorica"
+SET c.durationGM = duration( {minutes:25} ), c.roadType = "state road";
+
+MATCH (city1:City)-[c:CONNECTION]-(city2:City)
+WHERE 
+    city1.name = "Zagreb" AND 
+    city2.name = "Krizevci"
+SET c.durationGM = duration( {minutes:50} ), c.roadType = "state road";
+
+
+MATCH (city1:City)-[c:CONNECTION]-(city2:City)
+WHERE 
+    city1.name = "Sisak" AND 
+    city2.name = "Velika Gorica"
+SET c.durationGM = duration( {minutes:41} ), c.roadType = "highway";
+
+MATCH (city1:City)-[c:CONNECTION]-(city2:City)
+WHERE 
+    city1.name = "Varazdin" AND 
+    city2.name = "Cakovec"
+SET c.durationGM = duration( {minutes:21} ), c.roadType = "highway";
+
+MATCH (city1:City)-[c:CONNECTION]-(city2:City)
+WHERE 
+    city1.name = "Varazdin" AND 
+    city2.name = "Koprivnica"
+SET c.durationGM = duration( {minutes:50} ), c.roadType = "state road";
+
+MATCH (city1:City)-[c:CONNECTION]-(city2:City)
+WHERE 
+    city1.name = "Varazdin" AND 
+    city2.name = "Krizevci"
+SET c.durationGM = duration( {minutes:54} ), c.roadType = "state road";
+
+MATCH (city1:City)-[c:CONNECTION]-(city2:City)
+WHERE 
+    city1.name = "Koprivnica" AND 
+    city2.name = "Krizevci"
+SET c.durationGM = duration( {minutes:34} ), c.roadType = "state road";
+
+
+MATCH (city1:City)-[c:CONNECTION]-(city2:City)
+WHERE 
+    city1.name = "Bjelovar" AND 
+    city2.name = "Krizevci"
+SET c.durationGM = duration( {minutes:33} ), c.roadType = "state road";
+
+MATCH (city1:City)-[c:CONNECTION]-(city2:City)
+WHERE 
+    city1.name = "Sisak" AND 
+    city2.name = "Bjelovar"
+SET c.durationGM = duration( {hours:1, minutes:27} ), c.roadType = "state road";
+
+MATCH (city1:City)-[c:CONNECTION]-(city2:City)
+WHERE 
+    city1.name = "Bjelovar" AND 
+    city2.name = "Koprivnica"
+SET c.durationGM = duration( {minutes:45} ), c.roadType = "state road";
+
+MATCH (city1:City)-[c:CONNECTION]-(city2:City)
+WHERE 
+    city1.name = "Koprivnica" AND 
+    city2.name = "Virovitica"
+SET c.durationGM = duration( {hours:1} ), c.roadType = "state road";
+
+MATCH (city1:City)-[c:CONNECTION]-(city2:City)
+WHERE 
+    city1.name = "Bjelovar" AND 
+    city2.name = "Virovitica"
+SET c.durationGM = duration( {hours:1} ), c.roadType = "state road";
+
+MATCH (city1:City)-[c:CONNECTION]-(city2:City)
+WHERE 
+    city1.name = "Nova Gradiska" AND 
+    city2.name = "Virovitica"
+SET c.durationGM = duration( {hours:1, minutes:48} ), c.roadType = "state road";
+
+MATCH (city1:City)-[c:CONNECTION]-(city2:City)
+WHERE 
+    city1.name = "Bjelovar" AND 
+    city2.name = "Nova Gradiska"
+SET c.durationGM = duration( {hours:1, minutes:45} ), c.roadType = "state road";
+
+MATCH (city1:City)-[c:CONNECTION]-(city2:City)
+WHERE 
+    city1.name = "Nova Gradiska" AND 
+    city2.name = "Sisak"
+SET c.durationGM = duration( {hours:1, minutes:12} ), c.roadType = "highway";
+
+MATCH (city1:City)-[c:CONNECTION]-(city2:City)
+WHERE 
+    city1.name = "Nova Gradiska" AND 
+    city2.name = "Slavonski Brod"
+SET c.durationGM = duration( {minutes:41} ), c.roadType = "highway";
+
+MATCH (city1:City)-[c:CONNECTION]-(city2:City)
+WHERE 
+    city1.name = "Dakovo" AND 
+    city2.name = "Slavonski Brod"
+SET c.durationGM = duration( {minutes:38} ), c.roadType = "highway";
+
+MATCH (city1:City)-[c:CONNECTION]-(city2:City)
+WHERE 
+    city1.name = "Osijek" AND 
+    city2.name = "Dakovo"
+SET c.durationGM = duration( {minutes:38} ), c.roadType = "state road";
+
+MATCH (city1:City)-[c:CONNECTION]-(city2:City)
+WHERE 
+    city1.name = "Osijek" AND 
+    city2.name = "Virovitica"
+SET c.durationGM = duration( {hours:1, minutes:51} ), c.roadType = "state road";
+
+MATCH (city1:City)-[c:CONNECTION]-(city2:City)
+WHERE 
+    city1.name = "Vinkovci" AND 
+    city2.name = "Dakovo"
+SET c.durationGM = duration( {minutes:42} ), c.roadType = "state road";
+
+MATCH (city1:City)-[c:CONNECTION]-(city2:City)
+WHERE 
+    city1.name = "Vinkovci" AND 
+    city2.name = "Vukovar"
+SET c.durationGM = duration( {minutes:25} ), c.roadType = "state road";
+
+MATCH (city1:City)-[c:CONNECTION]-(city2:City)
+WHERE 
+    city1.name = "Osijek" AND 
+    city2.name = "Vukovar"
+SET c.durationGM = duration( {minutes:42} ), c.roadType = "state road";
+// , c.distance = 43
+
+
+/*
+Dodavanje novog svojstva _duration_ za svaki brid.
+Svojstvo označava potrebno vrijeme za proći put između odgovarajuća
+dva grada te se računa po pojednostavljenoj formuli: duljina_relacije_u_km / prosječna_brzina_na_relaciji.
+Ako je vrsta ceste na relaciji 'state road' za prosječnu brzinu uzimamo 70km/h,
+a u slučaju autoceste('highway') uzimamo 120km/h.
+*/
+
+/*
+U računu se brzine pišu u decimalnom obliku da se 'potakne' necjelobrojno računanje.
+*/
+MATCH ()-[c:CONNECTION]->() 
+SET c.duration = 
+CASE
+    WHEN c.roadType = "state road"
+       THEN duration( {hours: c.distance / 60.0} )
+    WHEN c.roadType = "highway"
+        THEN duration( {hours: c.distance / 110.0} )
+END
+
+/*
+Sada računamo razliku 'stvarnog'(Google maps) i 'izračunatog' vremenskog trajanja relacija.
+*/
+/*
+Razmotrena su dva slučaja, ovisno o tome koje trajanje je duže, tako da _durationDifference_ svojstvo ne sadrži negativne vrijednosti.
+*/
+MATCH ()-[c:CONNECTION]->()
+SET c.durationDifference = 
+CASE 
+    WHEN localtime() + c.duration > localtime() + c.durationGM
+        THEN c.duration - c.durationGM
+    ELSE c.durationGM - c.duration
+END
+
+/*
+Usporedbe radi, računamo prosječno i maksimalno odstupanje izračunatog, od stvarnog trajanja svake relacije.
+*/
+MATCH (c1:City)-[c:CONNECTION]->(c2:City) 
+WITH max( c.durationDifference ) as MAX 
+MATCH (c1:City)-[c:CONNECTION]->(c2:City) 
+WHERE c.durationDifference = MAX 
+RETURN c1.name AS `starting point`, c2.name AS `destination`, MAX.hours AS `max-error-estimate(h)`, MAX.minutesOfHour AS `max-error-estimate(min)`
+
+╒════════════════╤═════════════╤═══════════════════════╤═════════════════════════╕
+│"starting point"│"destination"│"max-error-estimate(h)"│"max-error-estimate(min)"│
+╞════════════════╪═════════════╪═══════════════════════╪═════════════════════════╡
+│"Sibenik"       │"Kastela"    │0                      │23                       │
+└────────────────┴─────────────┴───────────────────────┴─────────────────────────┘
+
+MATCH (c1:City)-[c:CONNECTION]->(c2:City) 
+WITH avg( c.durationDifference ) AS AVG 
+RETURN AVG.hours AS `avg-error-estimate(h)`, AVG.minutesOfHour AS `avg-error-estimate(min)`
+
+╒═══════════════════════╤═════════════════════════╕
+│"avg-error-estimate(h)"│"avg-error-estimate(min)"│
+╞═══════════════════════╪═════════════════════════╡
+│0                      │9                        │
+└───────────────────────┴─────────────────────────┘
+
+/*
+Pomoćna svojstva _durationGm_ te _durationDifference_ sada brišemo iz baze, radi preglednosti.
+Budući da se odstupanja izračunatih vrijednosti, od vrijednosti s Google maps-a kreću većinom do 10min,
+nadalje ćemo njih uzimati kao relevantne u upitima. 
+*/
+MATCH ()-[c:CONNECTION]->()
+REMOVE c.durationDifference, c.durationGM
+
+/***********************************************************************************************************************************************************************/
+
+/*
+Vrijeme prolaska kroz svaki grad aproksimiramo ovisno o veličini grada, i to na način prikazan u sljedećoj tablici.
+╔════════════════════╦═════════════════════════════════╗
+║ Stanovnici(tisuće) ║ Vrijeme prolaska kroz grad(min) ║
+╠════════════════════╬═════════════════════════════════╣
+║ >200               ║ 30                              ║
+╠════════════════════╬═════════════════════════════════╣
+║ 100-200            ║ 20                              ║
+╠════════════════════╬═════════════════════════════════╣
+║ 55-100             ║ 15                              ║
+╠════════════════════╬═════════════════════════════════╣
+║ 35-55              ║ 10                              ║
+╠════════════════════╬═════════════════════════════════╣
+║ 20-35              ║ 8                               ║
+╠════════════════════╬═════════════════════════════════╣
+║ <20                ║ 5                               ║
+╚════════════════════╩═════════════════════════════════╝
+*/
+
+/* >200 */
+MATCH (c:City) WHERE c.name = "Zagreb"
+SET c.tourDuration = Duration( {minutes:30} );
+
+/* 100-200 */
+MATCH (c:City) WHERE c.name IN ["Split", "Osijek", "Rijeka"]
+SET c.tourDuration = Duration( {minutes:20} );
+
+/* 55-100 */
+MATCH (c:City) WHERE c.name IN ["Slavonski Brod", "Velika Gorica", "Karlovac", "Pula", "Zadar"]
+SET c.tourDuration = Duration( {minutes:15} );
+
+/* 35-55 */
+MATCH (c:City) WHERE c.name IN ["Vinkovci", "Bjelovar", "Varazdin", "Sisak", "Samobor", "Sibenik", "Kastela", "Dubrovnik"]
+SET c.tourDuration = Duration( {minutes:10} );
+
+/* 20-35 */
+MATCH (c:City) WHERE c.name IN ["Vukovar", "Dakovo", "Virovitica", "Koprivnica", "Krizevci", "Cakovec", "Sinj"]
+SET c.tourDuration = Duration( {minutes:8} );
+
+/* <20 */
+MATCH (c:City) WHERE c.name IN ["Nova Gradiska", "Gospic", "Knin", "Imotski", "Makarska"]
+SET c.tourDuration = Duration( {minutes:5} );
+
