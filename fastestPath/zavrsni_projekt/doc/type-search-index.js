@@ -1,0 +1,1 @@
+typeSearchIndex = [{"l":"All Classes","url":"allclasses-index.html"},{"p":"hr.pmf.nbp.projekt","l":"FastestPath.Checkpoint"},{"p":"hr.pmf.nbp.projekt","l":"FastestPath"}]
