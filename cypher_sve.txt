@@ -134,7 +134,6 @@ YIELD sourceNodeId, targetNodeId, distance
 WHERE sourceNodeId < targetNodeId
 RETURN algo.getNodeById(sourceNodeId).name AS source, algo.getNodeById(targetNodeId).name AS target, distance
 ORDER BY distance DESC
-LIMIT 10
 
 /*
 All pairs shortest path, sortirano uzlazno.
@@ -144,7 +143,6 @@ YIELD sourceNodeId, targetNodeId, distance
 WHERE sourceNodeId < targetNodeId
 RETURN algo.getNodeById(sourceNodeId).name AS source, algo.getNodeById(targetNodeId).name AS target, distance
 ORDER BY distance ASC
-LIMIT 10
 
 
 /***********************************************************************************************************************************************************************/
@@ -179,8 +177,7 @@ MATCH path = (n:City {name:'Zagreb'})-[:MINST*]-()
 WITH relationships(path) AS rels
 UNWIND rels AS rel
 WITH DISTINCT rel AS rel
-RETURN startNode(rel).name AS source, endNode(rel).name AS destination,
-rel.distance AS cost;
+RETURN startNode(rel).name AS source, endNode(rel).name AS destination, rel.distance AS cost;
 
 MATCH (n) RETURN n;
 
