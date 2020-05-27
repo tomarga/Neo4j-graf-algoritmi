@@ -1,11 +1,198 @@
+/*
+Ovdje navodimo sve Cypher upite čije smo rezultate iznijeli i objasnili u seminaru.
+Navodimo ih po redu tako da prate strukturu seminara.
+*/
+
+/***********************************************************************************************************************************************************************/
+1. BAZA PODATAKA
+
+/*
+Kreiranje baze podataka.
+*/
+
+CREATE 
+    (zagreb:City {name: 'Zagreb'}),
+    (cakovec:City {name: 'Cakovec'}),
+    (varazdin:City {name: 'Varazdin'}),
+    (koprivnica:City {name: 'Koprivnica'}),
+    (virovitica:City {name: 'Virovitica'}),
+    (osijek:City {name: 'Osijek'}),
+    (vukovar:City {name: 'Vukovar'}),
+    (vinkovci:City {name: 'Vinkovci'}),
+    (dakovo:City {name: 'Dakovo'}), 
+    (slavonski:City {name: 'Slavonski Brod'}),
+    (nova:City {name: 'Nova Gradiska'}),
+    (bjelovar:City {name: 'Bjelovar'}),
+    (krizevci:City {name: 'Krizevci'}),
+    (velika:City {name: 'Velika Gorica'}),
+    (sisak:City {name: 'Sisak'}),
+    (samobor:City {name: 'Samobor'}),
+    (karlovac:City {name: 'Karlovac'}),
+    (rijeka:City {name: 'Rijeka'}),
+    (pula:City {name: 'Pula'}),
+    (gospic:City {name: 'Gospic'}),
+    (zadar:City {name: 'Zadar'}),
+    (knin:City {name: 'Knin'}),
+    (sibenik:City {name: 'Sibenik'}),
+    (kastela:City {name: 'Kastela'}),
+    (split:City {name: 'Split'}),
+    (sinj:City {name: 'Sinj'}),
+    (makarska:City {name: 'Makarska'}),
+    (imotski:City {name: 'Imotski'}),
+    (dubrovnik:City {name: 'Dubrovnik'}),
+
+    (zagreb)-[:CONNECTION {distance: 85.3}]->(varazdin),
+    (zagreb)-[:CONNECTION {distance: 67.1}]->(krizevci),
+    (zagreb)-[:CONNECTION {distance: 18.7}]->(velika),
+    (zagreb)-[:CONNECTION {distance: 23.2}]->(samobor),
+    (cakovec)-[:CONNECTION {distance: 15.5}]->(varazdin),
+    (varazdin)-[:CONNECTION {distance: 47.3}]->(koprivnica),
+    (varazdin)-[:CONNECTION {distance: 49.2}]->(krizevci),
+    (virovitica)-[:CONNECTION {distance: 110}]->(nova),
+    (virovitica)-[:CONNECTION {distance: 65.7}]->(bjelovar),
+    (virovitica)-[:CONNECTION {distance: 63.5}]->(koprivnica),
+    (virovitica)-[:CONNECTION {distance: 125}]->(osijek),
+    (osijek)-[:CONNECTION {distance: 36.9}]->(vukovar),
+    (osijek)-[:CONNECTION {distance: 43.4}]->(dakovo),
+    (vukovar)-[:CONNECTION {distance: 20.7}]->(vinkovci),
+    (vinkovci)-[:CONNECTION {distance: 38.7}]->(dakovo),
+    (dakovo)-[:CONNECTION {distance:52.3 }]->(slavonski),
+    (slavonski)-[:CONNECTION {distance: 56.9}]->(nova),
+    (nova)-[:CONNECTION {distance: 124}]->(bjelovar),
+    (nova)-[:CONNECTION {distance: 108}]->(sisak),
+    (bjelovar)-[:CONNECTION {distance: 42.2}]->(koprivnica),
+    (bjelovar)-[:CONNECTION {distance: 32.1}]->(krizevci),
+    (bjelovar)-[:CONNECTION {distance: 83.2}]->(sisak),
+    (koprivnica)-[:CONNECTION {distance: 32.2}]->(krizevci),
+    (velika)-[:CONNECTION {distance: 44.9}]->(sisak),
+    (zagreb)-[:CONNECTION {distance: 53.3}]->(karlovac),
+    (karlovac)-[:CONNECTION {distance: 113}]->(rijeka),
+    (karlovac)-[:CONNECTION {distance: 145}]->(gospic),
+    (rijeka)-[:CONNECTION {distance: 109}]->(pula),
+    (rijeka)-[:CONNECTION {distance: 151}]->(gospic),
+    (gospic)-[:CONNECTION {distance: 99}]->(zadar),
+    (gospic)-[:CONNECTION {distance: 104}]->(knin),
+    (zadar)-[:CONNECTION {distance: 88.2}]->(sibenik),
+    (knin)-[:CONNECTION {distance: 56.6}]->(sibenik),
+    (sibenik)-[:CONNECTION {distance: 55.8}]->(kastela),
+    (kastela)-[:CONNECTION {distance: 15.8}]->(split),
+    (split)-[:CONNECTION {distance: 36.2}]->(sinj),
+    (knin)-[:CONNECTION {distance: 67.4}]->(sinj),
+    (sinj)-[:CONNECTION {distance: 64.5}]->(imotski),
+    (makarska)-[:CONNECTION {distance: 88.8}]->(split),
+    (makarska)-[:CONNECTION {distance: 36.6}]->(imotski),
+    (makarska)-[:CONNECTION {distance: 153}]->(dubrovnik);
+
+
+/***********************************************************************************************************************************************************************/
+2. NAJKRAĆI PUT
+
+/*
+Single source shortest path sa Zagrebom kao izvorištem.
+*/
+
+MATCH (n:City {name:"Zagreb"})
+CALL algo.shortestPath.deltaStepping.stream(n, "distance", 1.0)
+YIELD nodeId, distance
+WHERE algo.isFinite(distance)
+RETURN algo.getNodeById(nodeId).name AS destination, distance
+ORDER BY distance
+
+
+/*
+Shortest path s određenom početnom i odredišnom točkom.
+*/
+
+MATCH ( start : City { name :"Zagreb"}) , ( end : City { name :"Rijeka"})
+CALL algo . shortestPath . stream ( start , end , " distance ")
+YIELD nodeId , cost
+MATCH ( other : City ) WHERE id ( other ) = nodeId
+RETURN other . name AS name , cost
+
+MATCH ( start : City { name :"Zagreb"}) , ( end : City { name :"Split"})
+CALL algo . shortestPath . stream ( start , end , " distance ")
+YIELD nodeId , cost
+MATCH ( other : City ) WHERE id ( other ) = nodeId
+RETURN other . name AS name , cost
+
+MATCH ( start : City { name :"Zagreb"}) , ( end : City { name :"Osijek"})
+CALL algo . shortestPath . stream ( start , end , " distance ")
+YIELD nodeId , cost
+MATCH ( other : City ) WHERE id ( other ) = nodeId
+RETURN other . name AS name , cost
+
+
+/***********************************************************************************************************************************************************************/
+3. NAJKRAĆI PUT MEĐU SVIM PAROVIMA
+
+/*
+All pairs shortest path, sortirano silazno.
+*/
+
+CALL algo.allShortestPaths.stream("distance")
+YIELD sourceNodeId, targetNodeId, distance
+WHERE sourceNodeId < targetNodeId
+RETURN algo.getNodeById(sourceNodeId).name AS source, algo.getNodeById(targetNodeId).name AS target, distance
+ORDER BY distance DESC
+LIMIT 10
+
+/*
+All pairs shortest path, sortirano uzlazno.
+*/
+CALL algo.allShortestPaths.stream("distance")
+YIELD sourceNodeId, targetNodeId, distance
+WHERE sourceNodeId < targetNodeId
+RETURN algo.getNodeById(sourceNodeId).name AS source, algo.getNodeById(targetNodeId).name AS target, distance
+ORDER BY distance ASC
+LIMIT 10
+
+
+/***********************************************************************************************************************************************************************/
+4. MINIMALNO RAZAPINJUĆE STABLO
+
+/*
+Zagreb i njegovi susjedi.
+*/
+
+MATCH (a {name:'Zagreb'})-[:CONNECTION]-(b) 
+RETURN a,b;
+
+/*
+Zagreb, Velika Gorica i njihovi susjedi.
+*/
+
+MATCH (a)-[:CONNECTION]-(b) 
+WHERE a.name IN ["Zagreb", "Velika Gorica"]
+RETURN a,b
+
+/*
+Minimalno razapinjuće stablo s početkom u vrhu Zagreb.
+*/
+
+MATCH (n:City {name:'Zagreb'})
+CALL algo.spanningTree.minimum('City', 'CONNECTION', 'distance', id(n),
+{write:true, writeProperty:'MINST'})
+YIELD loadMillis, computeMillis, writeMillis, effectiveNodeCount
+RETURN loadMillis, computeMillis, writeMillis, effectiveNodeCount
+
+MATCH path = (n:City {name:'Zagreb'})-[:MINST*]-()
+WITH relationships(path) AS rels
+UNWIND rels AS rel
+WITH DISTINCT rel AS rel
+RETURN startNode(rel).name AS source, endNode(rel).name AS destination,
+rel.distance AS cost;
+
+MATCH (n) RETURN n;
+
+
+/***********************************************************************************************************************************************************************/
+5. MODIFIKACIJA BAZE
 
 /*
 Iz opisa zadatka: 
 1. Pretvoriti udaljenosti između gradova u vrijeme koje je potrebno za prevaliti put između njih.
 2. Dodati za svaki grad vrijeme prolaska kroz sam grad.
 */
-
-/**********************************************************************************************************************************************************************/
 
 /*
 Dodavanje novih svojstava brida CONNECTION: durationGM i roadType.
@@ -14,17 +201,6 @@ To svojstvo koristimo samo za provjeru vremena(_duration_) kojeg ćemo naknadno 
 udaljenost te prosječnu brzinu vožnje na toj relaciji.
 _roadType_ označava vrstu ceste između dva grada, a moguće vrijednosti su: 'highway'(autocesta) i 'state road'(državna cesta).
 Ovisno o tom svojstvu se određuje prosječna brzina vožnje na određenoj relaciji. 
-*/
-
-/*
-Bridovi u kojima bi se eventualno trebale promijeniti _distance_ vrijednosti
-(jer je bila izabrana duljina najkraćeg, a ne optimalnog puta) sadrže
-komentirano u zadnjem retku moguću novu vrijednost.
-*/
-
-/*
-Da bi se na ovakav način odjednom mogli izvršiti svi dole navedeni MATCH upiti,
-potrebno je u Neo4j browser settingsima postaviti kvačicu na 'Enable multi statement query editor'.
 */
 
 MATCH (city1:City)-[c:CONNECTION]-(city2:City)
@@ -74,7 +250,6 @@ WHERE
     city1.name = "Kastela" AND 
     city2.name = "Sibenik"
 SET c.durationGM = duration( {minutes:54} ), c.roadType = "highway";
-// , c.distance = 64.9
 
 MATCH (city1:City)-[c:CONNECTION]-(city2:City)
 WHERE 
@@ -100,21 +275,11 @@ WHERE
     city2.name = "Gospic"
 SET c.durationGM = duration( {hours:1, minutes:10} ), c.roadType = "highway";
 
-//Ri-Go, ako ne mijenjamo distance - magistrala
 MATCH (city1:City)-[c:CONNECTION]-(city2:City)
 WHERE 
     city1.name = "Rijeka" AND 
     city2.name = "Gospic"
 SET c.durationGM = duration( {hours:2, minutes:11} ), c.roadType = "state road";
-
-/*
-//Ri-Go, autocesta
-MATCH (city1:City)-[c:CONNECTION]-(city2:City)
-WHERE 
-    city1.name = "Rijeka" AND 
-    city2.name = "Gospic"
-SET c.durationGM = duration( {hours:2, minutes:11} ), c.roadType = "highway";
-*/
 
 MATCH (city1:City)-[c:CONNECTION]-(city2:City)
 WHERE 
@@ -285,20 +450,20 @@ WHERE
     city1.name = "Osijek" AND 
     city2.name = "Vukovar"
 SET c.durationGM = duration( {minutes:42} ), c.roadType = "state road";
-// , c.distance = 43
 
 
 /*
 Dodavanje novog svojstva _duration_ za svaki brid.
 Svojstvo označava potrebno vrijeme za proći put između odgovarajuća
 dva grada te se računa po pojednostavljenoj formuli: duljina_relacije_u_km / prosječna_brzina_na_relaciji.
-Ako je vrsta ceste na relaciji 'state road' za prosječnu brzinu uzimamo 70km/h,
-a u slučaju autoceste('highway') uzimamo 120km/h.
+Ako je vrsta ceste na relaciji 'state road' za prosječnu brzinu uzimamo 60km/h,
+a u slučaju autoceste('highway') uzimamo 110km/h.
 */
 
 /*
 U računu se brzine pišu u decimalnom obliku da se 'potakne' necjelobrojno računanje.
-*/
+*/ 
+
 MATCH ()-[c:CONNECTION]->() 
 SET c.duration = 
 CASE
@@ -308,12 +473,12 @@ CASE
         THEN duration( {hours: c.distance / 110.0} )
 END
 
+
 /*
 Sada računamo razliku 'stvarnog'(Google maps) i 'izračunatog' vremenskog trajanja relacija.
-*/
-/*
 Razmotrena su dva slučaja, ovisno o tome koje trajanje je duže, tako da _durationDifference_ svojstvo ne sadrži negativne vrijednosti.
 */
+
 MATCH ()-[c:CONNECTION]->()
 SET c.durationDifference = 
 CASE 
@@ -322,58 +487,51 @@ CASE
     ELSE c.durationGM - c.duration
 END
 
+
 /*
 Usporedbe radi, računamo prosječno i maksimalno odstupanje izračunatog, od stvarnog trajanja svake relacije.
 */
+
 MATCH (c1:City)-[c:CONNECTION]->(c2:City) 
 WITH max( c.durationDifference ) as MAX 
 MATCH (c1:City)-[c:CONNECTION]->(c2:City) 
 WHERE c.durationDifference = MAX 
 RETURN c1.name AS `starting point`, c2.name AS `destination`, MAX.hours AS `max-error-estimate(h)`, MAX.minutesOfHour AS `max-error-estimate(min)`
 
+/*
+Ovdje prikazujemo i rezultat, jer nije eksplicitno naveden u seminaru.
 ╒════════════════╤═════════════╤═══════════════════════╤═════════════════════════╕
 │"starting point"│"destination"│"max-error-estimate(h)"│"max-error-estimate(min)"│
 ╞════════════════╪═════════════╪═══════════════════════╪═════════════════════════╡
 │"Sibenik"       │"Kastela"    │0                      │23                       │
 └────────────────┴─────────────┴───────────────────────┴─────────────────────────┘
+*/
 
 MATCH (c1:City)-[c:CONNECTION]->(c2:City) 
 WITH avg( c.durationDifference ) AS AVG 
 RETURN AVG.hours AS `avg-error-estimate(h)`, AVG.minutesOfHour AS `avg-error-estimate(min)`
 
+/*
 ╒═══════════════════════╤═════════════════════════╕
 │"avg-error-estimate(h)"│"avg-error-estimate(min)"│
 ╞═══════════════════════╪═════════════════════════╡
 │0                      │9                        │
 └───────────────────────┴─────────────────────────┘
+*/
+
 
 /*
 Pomoćna svojstva _durationGm_ te _durationDifference_ sada brišemo iz baze, radi preglednosti.
-Budući da se odstupanja izračunatih vrijednosti, od vrijednosti s Google maps-a kreću većinom do 10min,
-nadalje ćemo njih uzimati kao relevantne u upitima. 
 */
+
 MATCH ()-[c:CONNECTION]->()
 REMOVE c.durationDifference, c.durationGM
 
-/***********************************************************************************************************************************************************************/
+
 
 /*
-Vrijeme prolaska kroz svaki grad aproksimiramo ovisno o veličini grada, i to na način prikazan u sljedećoj tablici.
-╔════════════════════╦═════════════════════════════════╗
-║ Stanovnici(tisuće) ║ Vrijeme prolaska kroz grad(min) ║
-╠════════════════════╬═════════════════════════════════╣
-║ >200               ║ 30                              ║
-╠════════════════════╬═════════════════════════════════╣
-║ 100-200            ║ 20                              ║
-╠════════════════════╬═════════════════════════════════╣
-║ 55-100             ║ 15                              ║
-╠════════════════════╬═════════════════════════════════╣
-║ 35-55              ║ 10                              ║
-╠════════════════════╬═════════════════════════════════╣
-║ 20-35              ║ 8                               ║
-╠════════════════════╬═════════════════════════════════╣
-║ <20                ║ 5                               ║
-╚════════════════════╩═════════════════════════════════╝
+Vrijeme prolaska kroz svaki grad aproksimiramo ovisno o broju stanovnika svakog grada.
+(U sljedećim komentarima, 'mjerna jedinica' je tisuća stanovnika.)
 */
 
 /* >200 */
@@ -399,4 +557,67 @@ SET c.tourDuration = Duration( {minutes:8} );
 /* <20 */
 MATCH (c:City) WHERE c.name IN ["Nova Gradiska", "Gospic", "Knin", "Imotski", "Makarska"]
 SET c.tourDuration = Duration( {minutes:5} );
+
+
+/***********************************************************************************************************************************************************************/
+6. NAJBRŽI PUT
+
+/*
+Najbrži panorama put od Zagreba do Rijeke.
+*/
+
+CALL fastestPath( "Zagreb", "Rijeka", true ) YIELD name, cost 
+RETURN name as city, cost.Hours as hours, cost.MinutesOfHour as minutes
+
+CALL fastestPath( "Zagreb", "Rijeka", true ) YIELD name, cost 
+MATCH (c:City) WHERE c.name = name RETURN c
+
+
+/*
+Najbrži put od Zagreba do Rijeke.
+*/
+
+CALL fastestPath( "Zagreb", "Rijeka", false ) YIELD name, cost 
+RETURN name as city, cost.Hours as hours, cost.MinutesOfHour as minutes
+
+
+
+/*
+Najbrži panorama put od Zagreba do Osijeka.
+*/
+
+CALL fastestPath( "Zagreb", "Osijek", true ) YIELD name, cost 
+RETURN name as city, cost.Hours as hours, cost.MinutesOfHour as minutes
+
+CALL fastestPath( "Zagreb", "Osijek", true ) YIELD name, cost 
+MATCH (c:City) WHERE c.name = name RETURN c
+
+
+/*
+Najbrži put od Zagreba do Osijeka.
+*/
+
+CALL fastestPath( "Zagreb", "Osijek", false ) YIELD name, cost 
+RETURN name as city, cost.Hours as hours, cost.MinutesOfHour as minutes
+
+
+
+/*
+Najbrži panorama put od Zagreba do Splita.
+*/
+
+CALL fastestPath( "Zagreb", "Split", true ) YIELD name, cost 
+RETURN name as city, cost.Hours as hours, cost.MinutesOfHour as minutes
+
+CALL fastestPath( "Zagreb", "Split", true ) YIELD name, cost 
+MATCH (c:City) WHERE c.name = name RETURN c
+
+
+/*
+Najbrži put od Zagreba do Splita.
+*/
+
+CALL fastestPath( "Zagreb", "Split", false ) YIELD name, cost 
+RETURN name as city, cost.Hours as hours, cost.MinutesOfHour as minutes
+
 

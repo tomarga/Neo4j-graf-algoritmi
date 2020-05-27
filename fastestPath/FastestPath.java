@@ -21,12 +21,12 @@ import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAmount;
 
 /**
- * A class offers method that finds the fastest path, that is - the shortest path in the
+ * Class offers a method that finds the fastest path, that is - the shortest path in the
  * meaning of time needed to get from starting point to destination point.
  * The implemented algorithm is a simple version of Dijkstra's shortest path algorithm.
  * It returns result tuples (cityName, timeToGetToTheCity) of each node in the path.
  *
- * @author Margarita Tolja
+ * @author team Theta
  *
  */
 public class FastestPath {
@@ -48,7 +48,7 @@ public class FastestPath {
     
     //contains tuples (city, cityThatPrecedesIt)
     private static Map<Node,Node> visited;
-    
+        
     /**
      * Finds the fastest path from one city to another, and returns the checkpoints along the way.
      * If the panorama flag is set to true, the path is understood to go through all cities
@@ -141,8 +141,8 @@ public class FastestPath {
     
     /**
      * Utility method.
-     * Finds the city that takes the least time to reach at current point in
-     * the algorithm and is yet unchecked.
+     * Finds the city that takes the least time to reach (at current point in
+     * the algorithm) and is yet unchecked.
      * @return		The node most easily reached from the starting point.
      */
     private Node findClosestInQ() {
@@ -162,7 +162,7 @@ public class FastestPath {
     
     /**
      * Utility method.
-     * Gets the nodes directly connected to the node passed as argument.
+     * Gets the nodes directly connected to the node passed as an argument.
      * @param node		Node of interest.
      * @return			Map of tuples (node, relationshipThatConnectsThem).
      */
@@ -219,7 +219,7 @@ public class FastestPath {
     }
     
     /**
-     * The class of whose instances the result stream is built.
+     * The class whose instances the result stream is built of.
      * An instance represents the checkpoint in the path - containing
      * the name of the city as well as the amount of time needed to get there.
      */
